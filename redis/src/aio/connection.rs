@@ -16,9 +16,13 @@ pub(crate) async fn connect_simple<T: RedisRuntime>(
     Ok(match connection_info.addr {
         ConnectionAddr::Tcp(ref host, port) => {
             let socket_addrs = dns_resolver.resolve(host, port).await?;
-            select_ok(socket_addrs.map(|addr| Box::pin(<T>::connect_tcp(addr, tcp_settings))))
-                .await?
-                .0
+            tracing::debug!(host, port, "opening new connection");
+            select_ok(socket_addrs.map(|addr| {
+                tracing::debug!(host, port, ?addr, "trying connection");
+                Box::pin(<T>::connect_tcp(addr, tcp_settings))
+            }))
+            .await?
+            .0
         }
 
         #[cfg(any(feature = "tls-native-tls", feature = "tls-rustls"))]

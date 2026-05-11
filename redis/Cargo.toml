@@ -113,6 +113,8 @@ hashbrown = { version = "0.16", optional = true }
 
 lru = { version = "0.16", optional = true }
 
+tracing = "*"
+
 [features]
 default = ["acl", "streams", "geospatial", "script", "keep-alive", "num-bigint"]
 acl = []
